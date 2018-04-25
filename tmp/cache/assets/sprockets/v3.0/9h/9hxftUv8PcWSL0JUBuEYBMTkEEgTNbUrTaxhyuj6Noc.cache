@@ -1,0 +1,30 @@
+I"V(function() {
+  Spree.InlineTableLocales = Backbone.View.extend({
+    initialize: function() {
+      if (this.$el.length) {
+        return Spree.ajax({
+          type: 'GET',
+          url: "/api/config/available_locales",
+          success: (function(_this) {
+            return function(collection) {
+              var i, len, results, row, store;
+              results = [];
+              for (i = 0, len = collection.length; i < len; i++) {
+                store = collection[i];
+                row = $("<tr id='store-id-" + store.id + "'/>");
+                _this.$el.append(row);
+                results.push(new Spree.EditInlineLocales({
+                  el: row,
+                  model: store
+                }));
+              }
+              return results;
+            };
+          })(this)
+        });
+      }
+    }
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,115 @@
+I"�(function() {
+  Spree.EditInlineLocales = Backbone.View.extend({
+    initialize: function() {
+      this.editing = false;
+      return this.render();
+    },
+    events: {
+      'click [data-action=edit]': 'onEdit',
+      'click [data-action=save]': 'onSave',
+      'click [data-action=cancel]': 'onCancel'
+    },
+    onEdit: function(e) {
+      if (this.editing) {
+        return;
+      }
+      this.$el.addClass('editing');
+      this.editing = true;
+      return this.render();
+    },
+    onCancel: function(e) {
+      e.preventDefault();
+      this.$el.removeClass("editing");
+      this.editing = false;
+      return this.render();
+    },
+    onSave: function(e) {
+      var preferred_available_locales;
+      e.preventDefault();
+      preferred_available_locales = $('#available-locales-store-' + this.model.id);
+      return Spree.ajax({
+        type: 'PUT',
+        url: Spree.routes.available_locales_api + '/' + this.model.id + '.json',
+        data: {
+          store: {
+            preferred_available_locales: preferred_available_locales.val()
+          }
+        },
+        success: (function(_this) {
+          return function(response) {
+            _this.model = response.store;
+            _this.editing = false;
+            _this.$el.removeClass("editing");
+            return _this.render();
+          };
+        })(this),
+        error: (function(_this) {
+          return function(response) {
+            return show_flash('error', response.responseJSON.error);
+          };
+        })(this)
+      });
+    },
+    render: function() {
+      var renderAttr;
+      renderAttr = {
+        availableLocales: ["en", "pt-BR", "es", "zh-CN", "ja", "cs", "ro", "da", "id", "it", "nl", "zh-TW", "fr", "tr", "de", "es-MX", "es-EC", "fi", "ru", "pl", "ca", "de-CH", "en-IN", "en-AU", "uk", "lv", "vi", "et", "bg", "en-GB", "es-CL", "th", "pt", "nb", "sk", "en-NZ", "ko", "sv", "fa", "sl-SI", "en"],
+        availableLocalesPresentation: {
+          "en": "English (US)",
+          "pt-BR": "Português (BR)",
+          "es": "Castellano (ES)",
+          "zh-CN": "中文(简体)",
+          "ja": "日本語 (ja-JP)",
+          "cs": "Čeština (CS)",
+          "ro": "Romanian (RO)",
+          "da": "Danish",
+          "id": "Indonesian (ID)",
+          "it": "Italiano (IT)",
+          "nl": "Nederlands (NL)",
+          "zh-TW": "中文 (繁體)",
+          "fr": "Français (FR)",
+          "tr": "Türkçe (TR)",
+          "de": "Deutsch (DE)",
+          "es-MX": "Castellano (MX)",
+          "es-EC": "Español",
+          "fi": "Suomi",
+          "ru": "Russian",
+          "pl": "Polski (PL)",
+          "ca": "Català",
+          "de-CH": "Deutsch (Schweiz)",
+          "en-IN": "English (IN)",
+          "en-AU": "English (Australia)",
+          "uk": "Ukrainian",
+          "lv": "Latvijas (LV)",
+          "vi": "tiếng Việt (VN)",
+          "et": "Eesti keel",
+          "bg": "Български (БГ)",
+          "en-GB": "English (UK)",
+          "es-CL": "Español (Chile)",
+          "th": "ภาษาไทย (TH)",
+          "pt": "Português (PT)",
+          "nb": "Norsk",
+          "sk": "Slovenčina",
+          "en-NZ": "English (New Zealand)",
+          "ko": "한국어 (KO)",
+          "sv": "Svenska (SE)",
+          "fa": "فارسی(fa)",
+          "sl-SI": "Slovenščina (SL)"
+        },
+        store: this.model,
+        editing: this.editing
+      };
+      _.extend(renderAttr, this.model.attributes);
+      this.$el.html(HandlebarsTemplates['available_locales'](renderAttr));
+      $('.available-locales').select2({
+        placeholder: Spree.translations['please_choose_language'],
+        width: 'element'
+      });
+      return this;
+    }
+  });
+
+  Spree.routes.available_locales_api = Spree.pathFor('api/config/available_locales');
+
+}).call(this);
+:ET

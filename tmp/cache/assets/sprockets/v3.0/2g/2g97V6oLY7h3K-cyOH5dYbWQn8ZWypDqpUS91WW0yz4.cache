@@ -1,0 +1,31 @@
+I"ª(function() {
+  window.Handlebars.registerHelper('locale-presentation', function(locale, localePresentationHashmap, options) {
+    return localePresentationHashmap[locale];
+  });
+
+  window.Handlebars.registerHelper('selected', function(locale, store, options) {
+    var k, value;
+    for (k in store.preferences.available_locales) {
+      value = store.preferences.available_locales[k];
+      if (value === locale) {
+        return 'selected="selected"';
+      }
+    }
+  });
+
+  window.Handlebars.registerHelper('store-available-locales', function(store, options) {
+    var k, locale, locales;
+    locales = (function() {
+      var results;
+      results = [];
+      for (k in store.preferences.available_locales) {
+        locale = store.preferences.available_locales[k];
+        results.push(this.availableLocalesPresentation[locale]);
+      }
+      return results;
+    }).call(this);
+    return locales.join(',');
+  });
+
+}).call(this);
+:ET
